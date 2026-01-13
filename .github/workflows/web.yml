@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
-          cache: "yarn"
+          cache: yarn
       - run: yarn
       - run: yarn lint
 
@@ -32,31 +32,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
-          cache: "yarn"
+          cache: yarn
       - run: yarn
       - run: yarn test
 
   build:
     needs: [eslint, test]
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
-          cache: "yarn"
+          cache: yarn
       - run: yarn
       - run: yarn build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "dist"
-
+          path: dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          wait-for-build: true
