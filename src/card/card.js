@@ -27,7 +27,7 @@ export default function createCard(card, column, state, render, dnd) {
     ghost.style.position = "absolute";
     ghost.style.top = "-9999px";
     ghost.style.pointerEvents = "none";
-    document.body.appendChild(ghost);
+    document.body.append(ghost);
 
     dnd.setGhost(ghost);
 

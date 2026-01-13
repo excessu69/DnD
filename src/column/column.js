@@ -4,6 +4,8 @@ import { saveState } from "../app/app";
 const placeholder = document.createElement("div");
 placeholder.className = "card placeholder";
 
+let dragged = null;
+
 function getInsertPosition(container, mouseY) {
   const cards = [...container.children].filter(
     (el) => el !== placeholder && !el.classList.contains("dragging"),
@@ -25,7 +27,6 @@ export default function createColumn(column, state, render) {
   `;
 
   const cardsEl = col.querySelector(".cards");
-  let dragged = null;
   let ghostEl = null;
 
   column.cards.forEach((card) => {
@@ -45,7 +46,7 @@ export default function createColumn(column, state, render) {
         },
         clearGhost() {
           if (ghostEl) {
-            document.body.removeChild(ghostEl);
+            ghostEl.remove();
             ghostEl = null;
           }
         },
@@ -60,7 +61,7 @@ export default function createColumn(column, state, render) {
     const afterEl = getInsertPosition(cardsEl, e.clientY);
     afterEl
       ? cardsEl.insertBefore(placeholder, afterEl)
-      : cardsEl.appendChild(placeholder);
+      : cardsEl.append(placeholder);
   });
 
   cardsEl.addEventListener("drop", () => {
@@ -83,14 +84,44 @@ export default function createColumn(column, state, render) {
   addBtn.className = "add-card";
   addBtn.textContent = "+ Add another card";
 
-  addBtn.onclick = () => {
-    column.cards.push({
-      id: crypto.randomUUID(),
-      text: "New card",
+  function showAddForm() {
+    const form = document.createElement("div");
+    form.className = "add-form";
+    form.innerHTML = `
+      <textarea rows="3"></textarea>
+      <div class="add-form-actions">
+        <button class="add-btn">Add card</button>
+        <button class="cancel-btn" title="Cancel">×</button>
+      </div>
+    `;
+
+    const textarea = form.querySelector("textarea");
+    const confirm = form.querySelector(".add-btn");
+    const cancel = form.querySelector(".cancel-btn");
+
+    confirm.addEventListener("click", () => {
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      column.cards.push({
+        id: crypto.randomUUID(),
+        text,
+      });
+      saveState(state);
+      render();
     });
-    saveState(state);
-    render();
-  };
+
+    cancel.addEventListener("click", () => {
+      form.remove();
+      addBtn.style.display = "";
+    });
+
+    addBtn.style.display = "none";
+    col.insertBefore(form, addBtn);
+    textarea.focus();
+  }
+
+  addBtn.addEventListener("click", showAddForm);
 
   col.append(addBtn);
   return col;
