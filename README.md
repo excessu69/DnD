@@ -5,4 +5,6 @@
 
 ![CI](https://github.com/DnD/actions/workflows/web.yml/badge.svg)
 
+<!-- ссылка -->
+
 <a href="https://excessu69.github.io/DnD/" target="_blank">DnD</a>
